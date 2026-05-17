@@ -18,16 +18,16 @@
 
 ## Firmware Installation
 
-Add the module to `config/west.yml` after publishing it to your own Git repository:
+Add the module to `config/west.yml`:
 
 ```yaml
 manifest:
   remotes:
-    - name: yourname
-      url-base: https://github.com/yourname
+    - name: te9no
+      url-base: https://github.com/te9no
   projects:
     - name: zmk-module-oled-rpc
-      remote: yourname
+      remote: te9no
       revision: main
 ```
 
@@ -56,9 +56,7 @@ The firmware exposes this custom subsystem when ZMK Studio RPC is enabled:
 
 - Subsystem identifier: `dya__oled_status`
 - Firmware option: `CONFIG_DYA_OLED_STATUS_STUDIO_RPC=y`
-- UI URL in firmware: `https://yourname.github.io/zmk-module-oled-rpc/`
-
-Before publishing, replace the placeholder UI URL in `src/studio/oled_status_handler.c` with the actual GitHub Pages URL for this module.
+- UI URL in firmware: `https://te9no.github.io/zmk-module-oled-rpc/`
 
 The runtime settings are held in RAM. They apply immediately to the OLED, but they are not persisted across reboot yet.
 
@@ -106,4 +104,10 @@ npm install
 npm run build
 ```
 
-For GitHub Pages, publish `web/dist/` and point the firmware UI URL at that page.
+GitHub Actions publishes the Web UI to GitHub Pages on pushes to `main`.
+
+Repository settings required on GitHub:
+
+1. Open `Settings` -> `Pages`.
+2. Set `Build and deployment` source to `GitHub Actions`.
+3. Push to `main`; the `Deploy Web UI` workflow publishes `web/dist/`.

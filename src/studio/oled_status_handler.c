@@ -11,7 +11,7 @@
 LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 static struct zmk_rpc_custom_subsystem_meta dya_oled_status_meta = {
-    ZMK_RPC_CUSTOM_SUBSYSTEM_UI_URLS("https://yourname.github.io/zmk-module-oled-rpc/"),
+    ZMK_RPC_CUSTOM_SUBSYSTEM_UI_URLS("https://te9no.github.io/zmk-module-oled-rpc/"),
     .security = ZMK_STUDIO_RPC_HANDLER_UNSECURED,
 };
 
