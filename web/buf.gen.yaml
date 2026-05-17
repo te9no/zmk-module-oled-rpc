@@ -1,0 +1,9 @@
+version: v2
+plugins:
+  - local: protoc-gen-ts_proto
+    out: src/proto
+    opt:
+      - esModuleInterop=true
+      - forceLong=number
+      - useOptionals=messages
+      - outputClientImpl=false

@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package dya.oled_status;
+
+enum Orientation {
+    ORIENTATION_LANDSCAPE = 0;
+    ORIENTATION_PORTRAIT = 1;
+}
+
+enum Animation {
+    ANIMATION_OFF = 0;
+    ANIMATION_CYBER_FACE = 1;
+}
+
+message OledStatusConfig {
+    Orientation orientation = 1;
+    bool show_central_battery = 2;
+    bool show_peripheral_batteries = 3;
+    bool show_output = 4;
+    bool show_layer = 5;
+    bool show_wpm = 6;
+    bool show_modifiers = 7;
+    bool show_hid_indicators = 8;
+    Animation animation = 9;
+}
+
+message Capabilities {
+    bool central_battery = 1;
+    bool peripheral_batteries = 2;
+    bool output = 3;
+    bool layer = 4;
+    bool wpm = 5;
+    bool modifiers = 6;
+    bool hid_indicators = 7;
+    bool portrait = 8;
+    bool landscape = 9;
+    bool animation_cyber_face = 10;
+}
+
+message GetConfigRequest {}
+message GetConfigResponse {
+    OledStatusConfig config = 1;
+    Capabilities capabilities = 2;
+}
+
+message SetConfigRequest {
+    OledStatusConfig config = 1;
+}
+message SetConfigResponse {
+    OledStatusConfig config = 1;
+}
+
+message ResetConfigRequest {}
+message ResetConfigResponse {
+    OledStatusConfig config = 1;
+}
+
+message ErrorResponse {
+    string message = 1;
+}
+
+message Request {
+    oneof request_type {
+        GetConfigRequest get_config = 1;
+        SetConfigRequest set_config = 2;
+        ResetConfigRequest reset_config = 3;
+    }
+}
+
+message Response {
+    oneof response_type {
+        ErrorResponse error = 1;
+        GetConfigResponse get_config = 2;
+        SetConfigResponse set_config = 3;
+        ResetConfigResponse reset_config = 4;
+    }
+}

@@ -1,0 +1,5 @@
+---
+include:
+  - board: seeeduino_xiao_ble
+    shield: SAA_L_Base rgbled_adapter dya_oled_status
+    snippet: zmk-usb-logging studio-rpc-usb-uart

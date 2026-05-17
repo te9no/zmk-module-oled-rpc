@@ -1,0 +1,120 @@
+if SHIELD_DYA_OLED_STATUS
+
+config ZMK_DISPLAY
+    default y
+
+choice ZMK_DISPLAY_WORK_QUEUE
+    default ZMK_DISPLAY_WORK_QUEUE_DEDICATED
+endchoice
+
+choice ZMK_DISPLAY_STATUS_SCREEN
+    default ZMK_DISPLAY_STATUS_SCREEN_CUSTOM
+endchoice
+
+config ZMK_DISPLAY_STATUS_SCREEN_CUSTOM
+    imply DYA_OLED_STATUS_WIDGET
+
+config LV_Z_VDB_SIZE
+    default 64
+
+config LV_Z_BITS_PER_PIXEL
+    default 1
+
+choice LV_COLOR_DEPTH
+    default LV_COLOR_DEPTH_1
+endchoice
+
+config LV_DPI_DEF
+    default 148
+
+config LV_Z_MEM_POOL_SIZE
+    default 4096 if DYA_OLED_STATUS_WIDGET
+
+config ZMK_DISPLAY_DEDICATED_THREAD_STACK_SIZE
+    default 2560 if DYA_OLED_STATUS_WIDGET
+
+config DYA_OLED_STATUS_WIDGET
+    bool "DYA OLED modular status screen"
+    default y
+    select LV_USE_LABEL
+    select LV_USE_IMG
+
+if DYA_OLED_STATUS_WIDGET
+
+choice DYA_OLED_STATUS_ORIENTATION
+    prompt "DYA OLED layout orientation"
+    default DYA_OLED_STATUS_LANDSCAPE
+
+config DYA_OLED_STATUS_LANDSCAPE
+    bool "Landscape 128x64"
+
+config DYA_OLED_STATUS_PORTRAIT
+    bool "Portrait 64x128"
+
+endchoice
+
+config DYA_OLED_STATUS_WIDTH
+    int "DYA OLED logical width"
+    default 64 if DYA_OLED_STATUS_PORTRAIT
+    default 128
+
+config DYA_OLED_STATUS_HEIGHT
+    int "DYA OLED logical height"
+    default 128 if DYA_OLED_STATUS_PORTRAIT
+    default 64
+
+choice DYA_OLED_STATUS_ANIMATION
+    prompt "DYA OLED default animation"
+    default DYA_OLED_STATUS_ANIMATION_CYBER_FACE
+
+config DYA_OLED_STATUS_ANIMATION_OFF
+    bool "No animation"
+
+config DYA_OLED_STATUS_ANIMATION_CYBER_FACE
+    bool "Cyber face"
+
+endchoice
+
+config DYA_OLED_STATUS_WIDGET_BATTERY_CENTRAL
+    bool "Show central battery"
+    default y
+
+config DYA_OLED_STATUS_WIDGET_BATTERY_PERIPHERAL
+    bool "Show peripheral batteries"
+    default y
+    depends on ZMK_SPLIT && ZMK_SPLIT_ROLE_CENTRAL && ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING
+
+config DYA_OLED_STATUS_WIDGET_OUTPUT
+    bool "Show output status"
+    default y
+    depends on ZMK_BLE || ZMK_USB
+
+config DYA_OLED_STATUS_WIDGET_LAYER
+    bool "Show active layer"
+    default y
+
+config DYA_OLED_STATUS_WIDGET_WPM
+    bool "Show WPM"
+    default n
+    select ZMK_WPM
+
+config DYA_OLED_STATUS_WIDGET_MODIFIERS
+    bool "Show active modifiers"
+    default y
+
+config DYA_OLED_STATUS_WIDGET_HID_INDICATORS
+    bool "Show HID indicators"
+    default y
+    select ZMK_HID_INDICATORS
+
+config DYA_OLED_STATUS_LAYER_WIDTH
+    int "Layer label width"
+    default 62 if DYA_OLED_STATUS_PORTRAIT
+    default 54
+
+config DYA_OLED_STATUS_TEXT_SIZE_COMPACT
+    bool "Use compact labels"
+    default y
+
+endif # DYA_OLED_STATUS_WIDGET
+endif # SHIELD_DYA_OLED_STATUS

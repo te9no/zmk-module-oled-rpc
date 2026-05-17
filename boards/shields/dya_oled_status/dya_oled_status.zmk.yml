@@ -1,0 +1,8 @@
+file_format: "1"
+id: dya_oled_status
+name: DYA OLED Status
+url: https://github.com/local/dya-oled-status
+type: shield
+requires: [i2c]
+features:
+  - display

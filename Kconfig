@@ -1,0 +1,8 @@
+config DYA_OLED_STATUS_STUDIO_RPC
+    bool "Enable OLED RPC custom Studio RPC"
+    depends on DYA_OLED_STATUS_WIDGET
+    depends on ZMK_STUDIO_RPC
+    default y
+    select NANOPB
+    help
+      Exposes the dya__oled_status custom Studio subsystem used by DYA Studio Web UI.
