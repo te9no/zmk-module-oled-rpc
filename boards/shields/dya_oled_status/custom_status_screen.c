@@ -41,8 +41,6 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <dt-bindings/zmk/modifiers.h>
 #include <dya/oled_status_animation.h>
 
-#define SCREEN_W CONFIG_DYA_OLED_STATUS_WIDTH
-#define SCREEN_H CONFIG_DYA_OLED_STATUS_HEIGHT
 #define MAX_PERIPHERALS 4
 
 struct dya_oled_status_widget {
@@ -497,7 +495,8 @@ ZMK_SUBSCRIPTION(dya_oled_hid, zmk_hid_indicators_changed);
 
 lv_obj_t *zmk_display_status_screen(void) {
     lv_obj_t *screen = lv_obj_create(NULL);
-    lv_obj_set_size(screen, SCREEN_W, SCREEN_H);
+    lv_disp_t *disp = lv_disp_get_default();
+    lv_obj_set_size(screen, lv_disp_get_hor_res(disp), lv_disp_get_ver_res(disp));
 
     lv_style_init(&screen_style);
     lv_style_set_bg_color(&screen_style, lv_color_black());

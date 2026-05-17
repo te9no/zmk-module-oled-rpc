@@ -1,5 +1,8 @@
 #include <errno.h>
 
+#include <lvgl.h>
+#include <zephyr/init.h>
+#include <zephyr/kernel.h>
 #include <zephyr/sys/util.h>
 #if IS_ENABLED(CONFIG_SETTINGS)
 #include <zephyr/settings/settings.h>
@@ -64,6 +67,7 @@ void dya_oled_status_runtime_set(const struct dya_oled_status_runtime_config *co
 
 void dya_oled_status_runtime_reset(void) {
     runtime_config = default_config;
+    boot_orientation = runtime_config.orientation;
 #if IS_ENABLED(CONFIG_SETTINGS)
     settings_save_one(DYA_OLED_STATUS_SETTINGS_KEY, &runtime_config, sizeof(runtime_config));
 #endif
@@ -103,4 +107,34 @@ static int dya_oled_status_settings_set(const char *name, size_t len, settings_r
 
 SETTINGS_STATIC_HANDLER_DEFINE(dya_oled_status, "dya_oled_status", NULL,
                                dya_oled_status_settings_set, NULL, NULL);
+
+static int dya_oled_status_preload_settings(void) {
+    int rc = settings_subsys_init();
+    if (rc != 0) {
+        return rc;
+    }
+
+    return settings_load_subtree("dya_oled_status");
+}
+
+SYS_INIT(dya_oled_status_preload_settings, APPLICATION, 89);
 #endif
+
+static int dya_oled_status_apply_boot_display_rotation(void) {
+    ensure_initialized();
+
+    if (boot_orientation != DYA_OLED_STATUS_ORIENTATION_PORTRAIT) {
+        return 0;
+    }
+
+    lv_disp_t *disp = lv_disp_get_default();
+    if (disp == NULL || disp->driver == NULL) {
+        return -ENODEV;
+    }
+
+    disp->driver->sw_rotate = 1;
+    lv_disp_set_rotation(disp, LV_DISP_ROT_90);
+    return 0;
+}
+
+SYS_INIT(dya_oled_status_apply_boot_display_rotation, APPLICATION, 91);
