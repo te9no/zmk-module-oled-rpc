@@ -44,6 +44,8 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #define SCREEN_W CONFIG_DYA_OLED_STATUS_WIDTH
 #define SCREEN_H CONFIG_DYA_OLED_STATUS_HEIGHT
 #define MAX_PERIPHERALS 4
+#define PORTRAIT_TEXT_COL_W 10
+#define PORTRAIT_TEXT_HEIGHT 8
 
 struct dya_oled_status_widget {
     sys_snode_t node;
@@ -174,29 +176,63 @@ static void align_if_visible(lv_obj_t *obj, lv_align_t align, lv_coord_t x, lv_c
     }
 }
 
+static void set_portrait_transform(lv_obj_t *obj, bool portrait) {
+    if (obj == NULL) {
+        return;
+    }
+
+    lv_obj_set_style_transform_pivot_x(obj, 0, 0);
+    lv_obj_set_style_transform_pivot_y(obj, 0, 0);
+    lv_obj_set_style_transform_angle(obj, portrait ? 900 : 0, 0);
+}
+
+static void apply_text_orientation(struct dya_oled_status_widget *widget, bool portrait) {
+    set_portrait_transform(widget->battery_central, portrait);
+#if IS_ENABLED(CONFIG_DYA_OLED_STATUS_WIDGET_BATTERY_PERIPHERAL)
+    for (int i = 0; i < MAX_PERIPHERALS; i++) {
+        set_portrait_transform(widget->battery_peripheral[i], portrait);
+    }
+#endif
+    set_portrait_transform(widget->output, portrait);
+    set_portrait_transform(widget->layer, portrait);
+    set_portrait_transform(widget->wpm, portrait);
+    set_portrait_transform(widget->modifiers, portrait);
+    set_portrait_transform(widget->hid, portrait);
+}
+
+static void align_portrait_text_if_visible(lv_obj_t *obj, lv_coord_t *x) {
+    if (obj == NULL || lv_obj_has_flag(obj, LV_OBJ_FLAG_HIDDEN)) {
+        return;
+    }
+
+    lv_obj_set_pos(obj, *x + PORTRAIT_TEXT_HEIGHT, 0);
+    *x += PORTRAIT_TEXT_COL_W;
+}
+
 static void apply_layout(struct dya_oled_status_widget *widget) {
     const struct dya_oled_status_runtime_config *config = dya_oled_status_runtime_get();
+    const bool portrait = config->orientation == DYA_OLED_STATUS_ORIENTATION_PORTRAIT;
 
     apply_visibility(widget);
+    apply_text_orientation(widget, portrait);
 
-    if (config->orientation == DYA_OLED_STATUS_ORIENTATION_PORTRAIT) {
-        lv_coord_t y = 0;
-        const lv_coord_t row_h = 12;
+    if (portrait) {
+        lv_coord_t x = 0;
 
         if (animation_visible(config)) {
             lv_obj_align(widget->animation, LV_ALIGN_BOTTOM_MID, 0, 0);
         }
-        align_if_visible(widget->output, LV_ALIGN_TOP_LEFT, 0, 0, &y, row_h);
-        align_if_visible(widget->battery_central, LV_ALIGN_TOP_LEFT, 0, 0, &y, row_h);
+        align_portrait_text_if_visible(widget->output, &x);
+        align_portrait_text_if_visible(widget->battery_central, &x);
 #if IS_ENABLED(CONFIG_DYA_OLED_STATUS_WIDGET_BATTERY_PERIPHERAL)
         for (int i = 0; i < MAX_PERIPHERALS; i++) {
-            align_if_visible(widget->battery_peripheral[i], LV_ALIGN_TOP_LEFT, 0, 0, &y, row_h);
+            align_portrait_text_if_visible(widget->battery_peripheral[i], &x);
         }
 #endif
-        align_if_visible(widget->layer, LV_ALIGN_TOP_LEFT, 0, 0, &y, row_h);
-        align_if_visible(widget->wpm, LV_ALIGN_TOP_LEFT, 0, 0, &y, row_h);
-        align_if_visible(widget->modifiers, LV_ALIGN_TOP_LEFT, 0, 0, &y, row_h);
-        align_if_visible(widget->hid, LV_ALIGN_TOP_LEFT, 0, 0, &y, row_h);
+        align_portrait_text_if_visible(widget->layer, &x);
+        align_portrait_text_if_visible(widget->wpm, &x);
+        align_portrait_text_if_visible(widget->modifiers, &x);
+        align_portrait_text_if_visible(widget->hid, &x);
         return;
     }
 
