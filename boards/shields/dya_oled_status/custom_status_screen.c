@@ -176,7 +176,8 @@ static void align_if_visible(lv_obj_t *obj, lv_align_t align, lv_coord_t x, lv_c
 
 static void apply_layout(struct dya_oled_status_widget *widget) {
     const struct dya_oled_status_runtime_config *config = dya_oled_status_runtime_get();
-    const bool portrait = config->orientation == DYA_OLED_STATUS_ORIENTATION_PORTRAIT;
+    const bool portrait =
+        dya_oled_status_display_orientation_get() == DYA_OLED_STATUS_ORIENTATION_PORTRAIT;
 
     apply_visibility(widget);
 

@@ -1,5 +1,13 @@
+#include <errno.h>
+
 #include <zephyr/sys/util.h>
+#if IS_ENABLED(CONFIG_SETTINGS)
+#include <zephyr/settings/settings.h>
+#endif
+
 #include <dya/oled_status.h>
+
+#define DYA_OLED_STATUS_SETTINGS_KEY "dya_oled_status/config"
 
 static const struct dya_oled_status_runtime_config default_config = {
 #if IS_ENABLED(CONFIG_DYA_OLED_STATUS_PORTRAIT)
@@ -22,11 +30,13 @@ static const struct dya_oled_status_runtime_config default_config = {
 };
 
 static struct dya_oled_status_runtime_config runtime_config;
+static enum dya_oled_status_orientation boot_orientation;
 static bool runtime_config_initialized;
 
 static void ensure_initialized(void) {
     if (!runtime_config_initialized) {
         runtime_config = default_config;
+        boot_orientation = runtime_config.orientation;
         runtime_config_initialized = true;
     }
 }
@@ -36,17 +46,61 @@ const struct dya_oled_status_runtime_config *dya_oled_status_runtime_get(void) {
     return &runtime_config;
 }
 
+enum dya_oled_status_orientation dya_oled_status_display_orientation_get(void) {
+    ensure_initialized();
+    return boot_orientation;
+}
+
 void dya_oled_status_runtime_set(const struct dya_oled_status_runtime_config *config) {
     ensure_initialized();
     if (config == NULL) {
         return;
     }
     runtime_config = *config;
+#if IS_ENABLED(CONFIG_SETTINGS)
+    settings_save_one(DYA_OLED_STATUS_SETTINGS_KEY, &runtime_config, sizeof(runtime_config));
+#endif
 }
 
 void dya_oled_status_runtime_reset(void) {
     runtime_config = default_config;
+#if IS_ENABLED(CONFIG_SETTINGS)
+    settings_save_one(DYA_OLED_STATUS_SETTINGS_KEY, &runtime_config, sizeof(runtime_config));
+#endif
     runtime_config_initialized = true;
 }
 
 __attribute__((weak)) void dya_oled_status_display_refresh(void) {}
+
+#if IS_ENABLED(CONFIG_SETTINGS)
+static int dya_oled_status_settings_set(const char *name, size_t len, settings_read_cb read_cb,
+                                        void *cb_arg) {
+    const char *next;
+    if (!settings_name_steq(name, "config", &next) || next != NULL) {
+        return -ENOENT;
+    }
+
+    if (len != sizeof(runtime_config)) {
+        return -EINVAL;
+    }
+
+    ensure_initialized();
+    int rc = read_cb(cb_arg, &runtime_config, sizeof(runtime_config));
+    if (rc <= 0) {
+        return rc;
+    }
+
+    if (runtime_config.orientation != DYA_OLED_STATUS_ORIENTATION_PORTRAIT) {
+        runtime_config.orientation = DYA_OLED_STATUS_ORIENTATION_LANDSCAPE;
+    }
+    if (runtime_config.animation != DYA_OLED_STATUS_ANIMATION_CYBER_FACE) {
+        runtime_config.animation = DYA_OLED_STATUS_ANIMATION_OFF;
+    }
+
+    boot_orientation = runtime_config.orientation;
+    return 0;
+}
+
+SETTINGS_STATIC_HANDLER_DEFINE(dya_oled_status, "dya_oled_status", NULL,
+                               dya_oled_status_settings_set, NULL, NULL);
+#endif

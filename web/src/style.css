@@ -70,10 +70,18 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
   border-radius: 20px;
   padding: 16px;
   display: flex;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 24px;
 }
 .orientation-card legend { font-weight: 900; padding: 0 8px; }
 .orientation-card label { display: flex; gap: 8px; align-items: center; font-weight: 700; }
+.hint {
+  flex-basis: 100%;
+  color: #5b6d66;
+  font-size: 13px;
+  font-weight: 700;
+}
 
 .switch-list {
   display: grid;

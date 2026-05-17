@@ -58,7 +58,8 @@ The firmware exposes this custom subsystem when ZMK Studio RPC is enabled:
 - Firmware option: `CONFIG_DYA_OLED_STATUS_STUDIO_RPC=y`
 - UI URL in firmware: `https://te9no.github.io/zmk-module-oled-rpc/`
 
-The runtime settings are held in RAM. They apply immediately to the OLED, but they are not persisted across reboot yet.
+Runtime settings are persisted through Zephyr settings when `CONFIG_SETTINGS=y`.
+Widget visibility and animation apply immediately. Orientation is saved immediately but is applied on the next reboot to avoid unsafe runtime display rotation on SSD1306/LVGL.
 
 ## Kconfig Defaults
 
@@ -90,7 +91,7 @@ CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING=y
 
 The Web UI source is in `web/`. It talks to the `dya__oled_status` custom subsystem and can edit:
 
-- Orientation: landscape or portrait
+- Orientation: landscape or portrait, applied after reboot
 - Animation: off or cyber face
 - Central battery visibility
 - Peripheral battery visibility

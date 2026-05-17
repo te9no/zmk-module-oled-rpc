@@ -30,6 +30,7 @@ struct dya_oled_status_runtime_config {
 };
 
 const struct dya_oled_status_runtime_config *dya_oled_status_runtime_get(void);
+enum dya_oled_status_orientation dya_oled_status_display_orientation_get(void);
 void dya_oled_status_runtime_set(const struct dya_oled_status_runtime_config *config);
 void dya_oled_status_runtime_reset(void);
 void dya_oled_status_display_refresh(void);

@@ -52,7 +52,7 @@ function App() {
           <p className="eyebrow">ZMK custom Studio subsystem</p>
           <h1>OLED RPC</h1>
           <p className="hero-copy">
-            Edit OLED status modules, orientation, animation, and visibility at runtime.
+            Edit OLED status modules, animation, and visibility at runtime.
           </p>
         </div>
         <button className="secondary" onClick={() => setDemoMode((value) => !value)}>
@@ -231,6 +231,7 @@ function Editor({ demoMode = false }: { demoMode?: boolean }) {
           />
           Portrait
         </label>
+        <p className="hint">Orientation is saved immediately and applied after reboot.</p>
       </fieldset>
 
       <fieldset className="orientation-card">
