@@ -117,7 +117,9 @@ static int dya_oled_status_preload_settings(void) {
     return settings_load_subtree("dya_oled_status");
 }
 
-SYS_INIT(dya_oled_status_preload_settings, APPLICATION, 89);
+/* ZMK loads settings in main(), which is too late for LVGL display setup. */
+SYS_INIT(dya_oled_status_preload_settings, APPLICATION,
+         UTIL_DEC(CONFIG_APPLICATION_INIT_PRIORITY));
 #endif
 
 static int dya_oled_status_apply_boot_display_rotation(void) {
@@ -132,9 +134,11 @@ static int dya_oled_status_apply_boot_display_rotation(void) {
         return -ENODEV;
     }
 
+    /* SSD1306 does not implement display_set_orientation(); use LVGL software rotation. */
     disp->driver->sw_rotate = 1;
     lv_disp_set_rotation(disp, LV_DISP_ROT_90);
     return 0;
 }
 
-SYS_INIT(dya_oled_status_apply_boot_display_rotation, APPLICATION, 91);
+SYS_INIT(dya_oled_status_apply_boot_display_rotation, APPLICATION,
+         UTIL_INC(CONFIG_APPLICATION_INIT_PRIORITY));

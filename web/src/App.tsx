@@ -141,10 +141,10 @@ function Editor({ demoMode = false }: { demoMode?: boolean }) {
     }
   };
 
-  const save = async (nextConfig = config) => {
+  const save = async (nextConfig = config, requiresReboot = false) => {
     if (demoMode) {
       setConfig(nextConfig);
-      setStatus("Demo configuration applied");
+      setStatus(requiresReboot ? "Demo orientation saved; reboot would apply it" : "Demo configuration applied");
       return;
     }
 
@@ -152,7 +152,7 @@ function Editor({ demoMode = false }: { demoMode?: boolean }) {
     try {
       const response = await callRpc({ setConfig: { config: nextConfig } });
       if (response?.setConfig?.config) setConfig(response.setConfig.config);
-      setStatus("Applied to OLED");
+      setStatus(requiresReboot ? "Orientation saved. Reboot the keyboard to apply it." : "Applied to OLED");
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Failed to apply configuration");
     } finally {
@@ -170,8 +170,17 @@ function Editor({ demoMode = false }: { demoMode?: boolean }) {
     setIsLoading(true);
     try {
       const response = await callRpc({ resetConfig: {} });
-      if (response?.resetConfig?.config) setConfig(response.resetConfig.config);
-      setStatus("Reset to firmware defaults");
+      const resetConfig = response?.resetConfig?.config;
+      if (resetConfig) {
+        setConfig(resetConfig);
+        setStatus(
+          resetConfig.orientation !== config.orientation
+            ? "Reset saved. Reboot the keyboard to apply orientation."
+            : "Reset to firmware defaults",
+        );
+      } else {
+        setStatus("Reset to firmware defaults");
+      }
     } catch (error) {
       setStatus(error instanceof Error ? error.message : "Failed to reset configuration");
     } finally {
@@ -182,7 +191,7 @@ function Editor({ demoMode = false }: { demoMode?: boolean }) {
   const update = <K extends keyof OledStatusConfig>(key: K, value: OledStatusConfig[K]) => {
     const nextConfig = { ...config, [key]: value };
     setConfig(nextConfig);
-    void save(nextConfig);
+    void save(nextConfig, key === "orientation");
   };
 
   if (!demoMode && !subsystem) {
