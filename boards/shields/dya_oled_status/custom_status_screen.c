@@ -174,29 +174,11 @@ static void align_if_visible(lv_obj_t *obj, lv_align_t align, lv_coord_t x, lv_c
     }
 }
 
-static void apply_display_rotation(struct dya_oled_status_widget *widget, bool portrait) {
-    lv_disp_t *disp = lv_disp_get_default();
-    if (disp == NULL || disp->driver == NULL) {
-        return;
-    }
-
-    const lv_disp_rot_t target = portrait ? LV_DISP_ROT_90 : LV_DISP_ROT_NONE;
-    if (lv_disp_get_rotation(disp) != target) {
-        disp->driver->sw_rotate = 1;
-        lv_disp_set_rotation(disp, target);
-    }
-
-    if (widget->root != NULL) {
-        lv_obj_set_size(widget->root, lv_disp_get_hor_res(disp), lv_disp_get_ver_res(disp));
-    }
-}
-
 static void apply_layout(struct dya_oled_status_widget *widget) {
     const struct dya_oled_status_runtime_config *config = dya_oled_status_runtime_get();
     const bool portrait = config->orientation == DYA_OLED_STATUS_ORIENTATION_PORTRAIT;
 
     apply_visibility(widget);
-    apply_display_rotation(widget, portrait);
 
     if (portrait) {
         lv_coord_t y = 0;
