@@ -101,9 +101,19 @@ Build it with:
 
 ```bash
 cd web
-npm install
+npm ci
 npm run build
 ```
+
+For local development:
+
+```bash
+cd web
+npm run dev -- --host 127.0.0.1 --port 5173
+```
+
+The Web UI serializes RPC operations and uses a timeout so a missing subsystem
+does not leave the page permanently busy.
 
 GitHub Actions publishes the Web UI to GitHub Pages on pushes to `main`.
 

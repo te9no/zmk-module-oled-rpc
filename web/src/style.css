@@ -102,7 +102,14 @@ button:disabled { opacity: 0.5; cursor: not-allowed; }
 }
 .switch-row.disabled { opacity: 0.45; }
 .switch-row input { width: 22px; height: 22px; accent-color: #317466; }
-.status-line { font-weight: 800; color: #317466; }
+.status-line {
+  border-radius: 999px;
+  padding: 10px 14px;
+  font-weight: 800;
+}
+.status-line.info { background: rgba(49, 116, 102, 0.13); color: #255f53; }
+.status-line.success { background: rgba(39, 132, 85, 0.13); color: #1f754b; }
+.status-line.error { background: rgba(142, 43, 32, 0.13); color: #8e2b20; }
 .error, .warning { color: #8e2b20; }
 
 @media (max-width: 640px) {
